@@ -27,7 +27,7 @@
  * Domain Path: /languages
  * Requires at least: 4.0
  * Tested up to: 6.4
- * Requires PHP: 7.4
+ * Requires PHP: 5.6
  * Network: false
  */
 

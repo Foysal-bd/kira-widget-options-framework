@@ -28,33 +28,39 @@ When using the framework as a plugin, use the global variable:
 
 ```php
 public function form( $instance ) {
-    global $kira_widget_options_framework;
-    
-    // Text Field
-    $kira_widget_options_framework->text([
-        'name' => esc_attr($this->get_field_name('text')),
-        'label' => __('Text Field', 'kira'),
-        'description' => __('This is a text field', 'kira'),
-        'value' => isset($instance['text']) ? $instance['text'] : '',
-    ]);
-    
-    // Select Field with WordPress data
-    $kira_widget_options_framework->select([
-        'name' => esc_attr($this->get_field_name('menu')),
-        'label' => __('Select Menu', 'kira'),
-        'description' => __('Choose a navigation menu', 'kira'),
-        'options' => 'menu', // Uses WordPress menus
-        'value' => isset($instance['menu']) ? $instance['menu'] : '',
-    ]);
-    
-    // Color Field
-    $kira_widget_options_framework->color([
-        'name' => esc_attr($this->get_field_name('color')),
-        'label' => __('Accent Color', 'kira'),
-        'description' => __('Choose a color', 'kira'),
-        'value' => isset($instance['color']) ? $instance['color'] : '#ffffff',
-        'default' => '#ffffff',
-    ]);
+	global $kira_widget_options_framework;
+	
+	// Text Field.
+	$kira_widget_options_framework->text(
+		array(
+			'name'        => esc_attr( $this->get_field_name( 'text' ) ),
+			'label'       => __( 'Text Field', 'kira' ),
+			'description' => __( 'This is a text field', 'kira' ),
+			'value'       => isset( $instance['text'] ) ? $instance['text'] : '',
+		)
+	);
+	
+	// Select Field with WordPress data.
+	$kira_widget_options_framework->select(
+		array(
+			'name'        => esc_attr( $this->get_field_name( 'menu' ) ),
+			'label'       => __( 'Select Menu', 'kira' ),
+			'description' => __( 'Choose a navigation menu', 'kira' ),
+			'options'     => 'menu', // Uses WordPress menus.
+			'value'       => isset( $instance['menu'] ) ? $instance['menu'] : '',
+		)
+	);
+	
+	// Color Field.
+	$kira_widget_options_framework->color(
+		array(
+			'name'        => esc_attr( $this->get_field_name( 'color' ) ),
+			'label'       => __( 'Accent Color', 'kira' ),
+			'description' => __( 'Choose a color', 'kira' ),
+			'value'       => isset( $instance['color'] ) ? $instance['color'] : '#ffffff',
+			'default'     => '#ffffff',
+		)
+	);
 }
 ```
 
@@ -63,42 +69,48 @@ public function form( $instance ) {
 When embedding the framework in your project, create an instance of the class:
 
 ```php
-// Include the framework file
+// Include the framework file.
 require_once 'path/to/kira-widget-options-framework/includes/class-kira-widget-options-framework.php';
 
 public function form( $instance ) {
-    // Create instance of the framework
-    $kira_framework = new Kira_Widget_Options_Framework();
-    
-    // Text Field
-    $kira_framework->text([
-        'name' => esc_attr($this->get_field_name('title')),
-        'label' => __('Widget Title', 'kira'),
-        'value' => isset($instance['title']) ? $instance['title'] : '',
-    ]);
-    
-    // Radio Field
-    $kira_framework->radio([
-        'name' => esc_attr($this->get_field_name('layout')),
-        'label' => __('Layout Style', 'kira'),
-        'options' => [
-            'horizontal' => __('Horizontal', 'kira'),
-            'vertical' => __('Vertical', 'kira')
-        ],
-        'value' => isset($instance['layout']) ? $instance['layout'] : 'horizontal',
-    ]);
-    
-    // Checkbox Field
-    $kira_framework->checkbox([
-        'name' => esc_attr($this->get_field_name('features')),
-        'label' => __('Enable Features', 'kira'),
-        'options' => [
-            'feature1' => __('Feature 1', 'kira'),
-            'feature2' => __('Feature 2', 'kira'),
-            'feature3' => __('Feature 3', 'kira')
-        ],
-        'value' => isset($instance['features']) ? $instance['features'] : [],
-    ]);
+	// Create instance of the framework.
+	$kira_framework = new Kira_Widget_Options_Framework();
+	
+	// Text Field.
+	$kira_framework->text(
+		array(
+			'name'  => esc_attr( $this->get_field_name( 'title' ) ),
+			'label' => __( 'Widget Title', 'kira' ),
+			'value' => isset( $instance['title'] ) ? $instance['title'] : '',
+		)
+	);
+	
+	// Radio Field.
+	$kira_framework->radio(
+		array(
+			'name'    => esc_attr( $this->get_field_name( 'layout' ) ),
+			'label'   => __( 'Layout Style', 'kira' ),
+			'options' => array(
+				'horizontal' => __( 'Horizontal', 'kira' ),
+				'vertical'   => __( 'Vertical', 'kira' ),
+			),
+			'value'   => isset( $instance['layout'] ) ? $instance['layout'] : 'horizontal',
+		)
+	);
+	
+	// Checkbox Field.
+	$kira_framework->checkbox(
+		array(
+			'name'    => esc_attr( $this->get_field_name( 'features' ) ),
+			'label'   => __( 'Enable Features', 'kira' ),
+			'options' => array(
+				'feature1' => __( 'Feature 1', 'kira' ),
+				'feature2' => __( 'Feature 2', 'kira' ),
+				'feature3' => __( 'Feature 3', 'kira' ),
+			),
+			'value'   => isset( $instance['features'] ) ? $instance['features'] : array(),
+		)
+	);
 }
 ```
 
@@ -133,36 +145,44 @@ For select, radio, and checkbox fields, you can use these helper strings instead
 
 ### Before (v1.0):
 ```php
-// Plugin usage
+// Plugin usage.
 global $kira_widget_options_framework;
-echo $kira_widget_options_framework->text([
-    'name' => esc_attr($this->get_field_name('text')),
-    'value' => @$instance['text'] // Deprecated syntax
-]);
+echo $kira_widget_options_framework->text(
+	array(
+		'name'  => esc_attr( $this->get_field_name( 'text' ) ),
+		'value' => @$instance['text'], // Deprecated syntax.
+	)
+);
 
-// Embedded usage
+// Embedded usage.
 $kira_framework = new Kira_Widget_Options_Framework();
-echo $kira_framework->text([
-    'name' => esc_attr($this->get_field_name('text')),
-    'value' => @$instance['text'] // Deprecated syntax
-]);
+echo $kira_framework->text(
+	array(
+		'name'  => esc_attr( $this->get_field_name( 'text' ) ),
+		'value' => @$instance['text'], // Deprecated syntax.
+	)
+);
 ```
 
 ### After (v1.1):
 ```php
-// Plugin usage
+// Plugin usage.
 global $kira_widget_options_framework;
-$kira_widget_options_framework->text([
-    'name' => esc_attr($this->get_field_name('text')),
-    'value' => isset($instance['text']) ? $instance['text'] : '' // Modern syntax
-]);
+$kira_widget_options_framework->text(
+	array(
+		'name'  => esc_attr( $this->get_field_name( 'text' ) ),
+		'value' => isset( $instance['text'] ) ? $instance['text'] : '', // Modern syntax.
+	)
+);
 
-// Embedded usage
+// Embedded usage.
 $kira_framework = new Kira_Widget_Options_Framework();
-$kira_framework->text([
-    'name' => esc_attr($this->get_field_name('text')),
-    'value' => isset($instance['text']) ? $instance['text'] : '' // Modern syntax
-]);
+$kira_framework->text(
+	array(
+		'name'  => esc_attr( $this->get_field_name( 'text' ) ),
+		'value' => isset( $instance['text'] ) ? $instance['text'] : '', // Modern syntax.
+	)
+);
 ```
 
 **Important**: Remove all `echo` statements when calling framework methods. The methods now handle output internally.
@@ -177,7 +197,7 @@ $kira_framework->text([
 ## Requirements
 
 - WordPress 4.0 or higher
-- PHP 7.4 or higher
+- PHP 5.6 or higher
 
 ## License
 
