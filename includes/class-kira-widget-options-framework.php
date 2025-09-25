@@ -9,6 +9,10 @@
  * @package Kira_Widget_Options_Framework
  * @since 1.0
  * @author Nazmul Sabuz
+ * @version 1.1
+ * @license GPL-2.0
+ * @link https://github.com/sabuz/kira-widget-options-framework
+ * @see https://github.com/sabuz/kira-widget-options-framework/blob/master/README.md
  */
 
 /**
@@ -107,7 +111,7 @@ class Kira_Widget_Options_Framework {
 	 * @param string $args The type of data to retrieve ('page', 'post', 'menu', 'user').
 	 * @return array Associative array of options (ID => Name/Title)
 	 */
-	protected function _helper( $args ) {
+	protected function helper( $args ) {
 		$arr = [];
 
 		switch ( $args ) {
@@ -170,6 +174,47 @@ class Kira_Widget_Options_Framework {
 	}
 
 	/**
+	 * Get allowed HTML tags for widget form fields
+	 *
+	 * @since 1.0
+	 * @return array Allowed HTML tags and attributes
+	 */
+	private function get_allowed_html() {
+		return [
+			'p'        => [],
+			'label'    => [
+				'for'   => [],
+				'class' => [],
+			],
+			'input'    => [
+				'type'               => [],
+				'name'               => [],
+				'class'              => [],
+				'value'              => [],
+				'id'                 => [],
+				'data-default-color' => [],
+			],
+			'textarea' => [
+				'name'  => [],
+				'class' => [],
+				'id'    => [],
+			],
+			'select'   => [
+				'name'  => [],
+				'class' => [],
+				'id'    => [],
+			],
+			'option'   => [
+				'value'    => [],
+				'selected' => [],
+			],
+			'span'     => [
+				'class' => [],
+			],
+		];
+	}
+
+	/**
 	 * Generate a text input field
 	 *
 	 * Creates a single-line text input field with label and optional description.
@@ -186,7 +231,7 @@ class Kira_Widget_Options_Framework {
 	 *     @type string $html_class  Additional CSS classes.
 	 *     @type string $html_id     HTML ID attribute.
 	 * }
-	 * @return string HTML markup for the text field
+	 * @return void
 	 */
 	public function text( $args ) {
 		$defaults = [
@@ -200,17 +245,25 @@ class Kira_Widget_Options_Framework {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$html = '<p>
-			<label for="' . $args['name'] . '" class="widefat">' . $args['label'] . '</label>
-            <input type="text" name="' . $args['name'] . '" class="widefat" value="' . $args['value'] . '">';
+		// Sanitize values.
+		$name        = esc_attr( $args['name'] );
+		$label       = esc_html( $args['label'] );
+		$value       = esc_attr( $args['value'] );
+		$description = esc_html( $args['description'] );
+		$html_class  = esc_attr( $args['html_class'] );
+		$html_id     = esc_attr( $args['html_id'] );
 
-		if ( ! empty( $args['description'] ) ) {
-			$html .= '<span class="description">' . $args['description'] . '</span>';
+		$html  = '<p>';
+		$html .= '<label for="' . $name . '" class="widefat">' . $label . '</label>';
+		$html .= '<input type="text" name="' . $name . '" class="widefat ' . $html_class . '" value="' . $value . '"' . ( ! empty( $html_id ) ? ' id="' . $html_id . '"' : '' ) . '>';
+
+		if ( ! empty( $description ) ) {
+			$html .= '<span class="description">' . $description . '</span>';
 		}
 
 		$html .= '</p>';
 
-		return $html;
+		echo wp_kses( $html, $this->get_allowed_html() );
 	}
 
 	/**
@@ -230,7 +283,7 @@ class Kira_Widget_Options_Framework {
 	 *     @type string $html_class  Additional CSS classes.
 	 *     @type string $html_id     HTML ID attribute.
 	 * }
-	 * @return string HTML markup for the textarea field
+	 * @return void
 	 */
 	public function textarea( $args ) {
 		$defaults = [
@@ -244,17 +297,25 @@ class Kira_Widget_Options_Framework {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$html = '<p>
-			<label for="' . $args['name'] . '" class="widefat">' . $args['label'] . '</label>
-            <textarea name="' . $args['name'] . '" class="widefat">' . $args['value'] . '</textarea>';
+		// Sanitize values.
+		$name        = esc_attr( $args['name'] );
+		$label       = esc_html( $args['label'] );
+		$value       = esc_textarea( $args['value'] );
+		$description = esc_html( $args['description'] );
+		$html_class  = esc_attr( $args['html_class'] );
+		$html_id     = esc_attr( $args['html_id'] );
 
-		if ( ! empty( $args['description'] ) ) {
-			$html .= '<span class="description">' . $args['description'] . '</span>';
+		$html  = '<p>';
+		$html .= '<label for="' . $name . '" class="widefat">' . $label . '</label>';
+		$html .= '<textarea name="' . $name . '" class="widefat ' . $html_class . '"' . ( ! empty( $html_id ) ? ' id="' . $html_id . '"' : '' ) . '>' . $value . '</textarea>';
+
+		if ( ! empty( $description ) ) {
+			$html .= '<span class="description">' . $description . '</span>';
 		}
 
 		$html .= '</p>';
 
-		return $html;
+		echo wp_kses( $html, $this->get_allowed_html() );
 	}
 
 	/**
@@ -275,7 +336,7 @@ class Kira_Widget_Options_Framework {
 	 *     @type string $html_class  Additional CSS classes
 	 *     @type string $html_id     HTML ID attribute
 	 * }
-	 * @return string HTML markup for the select field
+	 * @return void
 	 */
 	public function select( $args ) {
 		$defaults = [
@@ -291,28 +352,39 @@ class Kira_Widget_Options_Framework {
 		$args = wp_parse_args( $args, $defaults );
 
 		if ( is_string( $args['options'] ) ) {
-			$args['options'] = $this->_helper( $args['options'] );
+			$args['options'] = $this->helper( $args['options'] );
 		}
 
-		$html = '<p>
-			<label for="' . $args['name'] . '" class="widefat">' . $args['label'] . '</label>
-			<select name="' . $args['name'] . '" class="widefat">';
+		// Sanitize values.
+		$name        = esc_attr( $args['name'] );
+		$label       = esc_html( $args['label'] );
+		$value       = esc_attr( $args['value'] );
+		$description = esc_html( $args['description'] );
+		$html_class  = esc_attr( $args['html_class'] );
+		$html_id     = esc_attr( $args['html_id'] );
+
+		$html  = '<p>';
+		$html .= '<label for="' . $name . '" class="widefat">' . $label . '</label>';
+		$html .= '<select name="' . $name . '" class="widefat ' . $html_class . '"' . ( ! empty( $html_id ) ? ' id="' . $html_id . '"' : '' ) . '>';
 
 		if ( ! empty( $args['options'] ) ) {
-			foreach ( $args['options'] as $key => $value ) {
-				$html .= '<option value="' . esc_html( $key ) . '" ' . ( esc_html( $args['value'] ) === esc_html( $key ) ? 'selected' : '' ) . '>' . esc_html( $value ) . '</option>';
+			foreach ( $args['options'] as $key => $option_value ) {
+				$key_escaped   = esc_attr( $key );
+				$value_escaped = esc_html( $option_value );
+				$selected      = ( $value === $key_escaped ) ? ' selected' : '';
+				$html         .= '<option value="' . $key_escaped . '"' . $selected . '>' . $value_escaped . '</option>';
 			}
 		}
 
 		$html .= '</select>';
 
-		if ( ! empty( $args['description'] ) ) {
-			$html .= '<span class="description">' . $args['description'] . '</span>';
+		if ( ! empty( $description ) ) {
+			$html .= '<span class="description">' . $description . '</span>';
 		}
 
 		$html .= '</p>';
 
-		return $html;
+		echo wp_kses( $html, $this->get_allowed_html() );
 	}
 
 	/**
@@ -334,7 +406,7 @@ class Kira_Widget_Options_Framework {
 	 *     @type string $html_class  Additional CSS classes
 	 *     @type string $html_id     HTML ID attribute
 	 * }
-	 * @return string HTML markup for the radio button group
+	 * @return void
 	 */
 	public function radio( $args ) {
 		$defaults = [
@@ -350,29 +422,40 @@ class Kira_Widget_Options_Framework {
 		$args = wp_parse_args( $args, $defaults );
 
 		if ( is_string( $args['options'] ) ) {
-			$args['options'] = $this->_helper( $args['options'] );
+			$args['options'] = $this->helper( $args['options'] );
 		}
 
-		$html = '<p>
-			<label for="' . $args['name'] . '" class="widefat">' . $args['label'] . '</label>
-			<span class="kira-widget-control-group-wrap">';
+		// Sanitize values.
+		$name        = esc_attr( $args['name'] );
+		$label       = esc_html( $args['label'] );
+		$value       = esc_attr( $args['value'] );
+		$description = esc_html( $args['description'] );
+		$html_class  = esc_attr( $args['html_class'] );
+		$html_id     = esc_attr( $args['html_id'] );
+
+		$html  = '<p>';
+		$html .= '<label for="' . $name . '" class="widefat">' . $label . '</label>';
+		$html .= '<span class="kira-widget-control-group-wrap">';
 
 		if ( ! empty( $args['options'] ) ) {
-			foreach ( $args['options'] as $key => $value ) {
-				$uid   = uniqid( null, $args['name'] );
-				$html .= '<label for="' . $uid . '"><input type="radio" name="' . $args['name'] . '" id="' . $uid . '" value="' . esc_html( $key ) . '" ' . ( esc_html( $args['value'] ) === esc_html( $key ) ? 'checked' : '' ) . '>' . esc_html( $value ) . '</label>';
+			foreach ( $args['options'] as $key => $option_value ) {
+				$uid           = uniqid( null, $name );
+				$key_escaped   = esc_attr( $key );
+				$value_escaped = esc_html( $option_value );
+				$checked       = ( $value === $key_escaped ) ? ' checked' : '';
+				$html         .= '<label for="' . $uid . '"><input type="radio" name="' . $name . '" id="' . $uid . '" value="' . $key_escaped . '"' . $checked . '>' . $value_escaped . '</label>';
 			}
 		}
 
 		$html .= '</span>';
 
-		if ( ! empty( $args['description'] ) ) {
-			$html .= '<span class="description">' . $args['description'] . '</span>';
+		if ( ! empty( $description ) ) {
+			$html .= '<span class="description">' . $description . '</span>';
 		}
 
 		$html .= '</p>';
 
-		return $html;
+		echo wp_kses( $html, $this->get_allowed_html() );
 	}
 
 	/**
@@ -394,7 +477,7 @@ class Kira_Widget_Options_Framework {
 	 *     @type string $html_class  Additional CSS classes
 	 *     @type string $html_id     HTML ID attribute
 	 * }
-	 * @return string HTML markup for the checkbox group
+	 * @return void
 	 */
 	public function checkbox( $args ) {
 		$defaults = [
@@ -402,7 +485,7 @@ class Kira_Widget_Options_Framework {
 			'label'       => '',
 			'description' => '',
 			'options'     => [],
-			'value'       => '',
+			'value'       => [],
 			'html_class'  => '',
 			'html_id'     => '',
 		];
@@ -410,29 +493,44 @@ class Kira_Widget_Options_Framework {
 		$args = wp_parse_args( $args, $defaults );
 
 		if ( is_string( $args['options'] ) ) {
-			$args['options'] = $this->_helper( $args['options'] );
+			$args['options'] = $this->helper( $args['options'] );
 		}
 
-		$html = '<p>
-			<label for="' . $args['name'] . '" class="widefat">' . $args['label'] . '</label>
-			<span class="kira-widget-control-group-wrap">';
+		// Ensure value is an array.
+		if ( ! is_array( $args['value'] ) ) {
+			$args['value'] = [];
+		}
+
+		// Sanitize values.
+		$name        = esc_attr( $args['name'] );
+		$label       = esc_html( $args['label'] );
+		$description = esc_html( $args['description'] );
+		$html_class  = esc_attr( $args['html_class'] );
+		$html_id     = esc_attr( $args['html_id'] );
+
+		$html  = '<p>';
+		$html .= '<label for="' . $name . '" class="widefat">' . $label . '</label>';
+		$html .= '<span class="kira-widget-control-group-wrap">';
 
 		if ( ! empty( $args['options'] ) ) {
-			foreach ( $args['options'] as $key => $value ) {
-				$uid   = uniqid( null, $args['name'] );
-				$html .= '<label for="' . $uid . '"><input type="checkbox" name="' . $args['name'] . '[]" id="' . $uid . '" value="' . esc_html( $key ) . '" ' . ( in_array( esc_html( $key ), $args['value'], true ) ? 'checked' : '' ) . '>' . esc_html( $value ) . '</label>';
+			foreach ( $args['options'] as $key => $option_value ) {
+				$uid           = uniqid( null, $name );
+				$key_escaped   = esc_attr( $key );
+				$value_escaped = esc_html( $option_value );
+				$checked       = in_array( $key_escaped, $args['value'], true ) ? ' checked' : '';
+				$html         .= '<label for="' . $uid . '"><input type="checkbox" name="' . $name . '[]" id="' . $uid . '" value="' . $key_escaped . '"' . $checked . '>' . $value_escaped . '</label>';
 			}
 		}
 
 		$html .= '</span>';
 
-		if ( ! empty( $args['description'] ) ) {
-			$html .= '<span class="description">' . $args['description'] . '</span>';
+		if ( ! empty( $description ) ) {
+			$html .= '<span class="description">' . $description . '</span>';
 		}
 
 		$html .= '</p>';
 
-		return $html;
+		echo wp_kses( $html, $this->get_allowed_html() );
 	}
 
 	/**
@@ -452,7 +550,7 @@ class Kira_Widget_Options_Framework {
 	 *     @type string $value       Current field value (hex color code).
 	 *     @type string $default     Default color value (hex color code).
 	 * }
-	 * @return string HTML markup for the color picker field
+	 * @return void
 	 */
 	public function color( $args ) {
 		wp_enqueue_style( 'wp-color-picker' );
@@ -468,16 +566,23 @@ class Kira_Widget_Options_Framework {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$html = '<p>
-			<label for="' . $args['name'] . '" class="widefat">' . $args['label'] . '</label>
-            <input type="text" name="' . $args['name'] . '" class="color-picker" value="' . $args['value'] . '" data-default-color="' . $args['default'] . '">';
+		// Sanitize values.
+		$name        = esc_attr( $args['name'] );
+		$label       = esc_html( $args['label'] );
+		$value       = esc_attr( $args['value'] );
+		$default     = esc_attr( $args['default'] );
+		$description = esc_html( $args['description'] );
 
-		if ( ! empty( $args['description'] ) ) {
-			$html .= '<span class="description">' . $args['description'] . '</span>';
+		$html  = '<p>';
+		$html .= '<label for="' . $name . '" class="widefat">' . $label . '</label>';
+		$html .= '<input type="text" name="' . $name . '" class="color-picker" value="' . $value . '" data-default-color="' . $default . '">';
+
+		if ( ! empty( $description ) ) {
+			$html .= '<span class="description">' . $description . '</span>';
 		}
 
 		$html .= '</p>';
 
-		return $html;
+		echo wp_kses( $html, $this->get_allowed_html() );
 	}
 }
