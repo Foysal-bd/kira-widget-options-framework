@@ -1,0 +1,8 @@
+.DS_Store
+*.log
+*.map
+composer.lock
+package-lock.json
+/node_modules
+/vendor
+/block/**/build
