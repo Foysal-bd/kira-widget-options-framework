@@ -1,5 +1,4 @@
 <?php
-hkjfkjf
 /**
  * Kira Widget Options Framework
  *
